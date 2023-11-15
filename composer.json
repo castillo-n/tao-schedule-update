@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ScheduleUpdates\\": "src/scheduled-updates"
+            "PostScheduler\\": "src/scheduled-updates"
         }
     }
 }
