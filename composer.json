@@ -1,5 +1,5 @@
 {
-    "name": "castillo-n/tao-schedule-update",
+    "name": "castillo-n/wp-scheduled-update",
     "description": "I am hoping to get this working with wp latest on php 8 and above and with composer call instead of plugin installation",
     "homepage": "https://github.com/castillo-n/tao-schedule-update",
     "forked-from": "https://github.com/tao-software/tao-schedule-update",
