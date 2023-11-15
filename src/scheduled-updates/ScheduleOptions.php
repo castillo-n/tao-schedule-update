@@ -9,7 +9,7 @@ namespace PostScheduler;
 /**
  * TAO Schedule Update options class
  */
-class ScheduledUpdate_Options {
+class ScheduleOptions {
 
 	/**
 	 * Holds all the options
@@ -18,7 +18,7 @@ class ScheduledUpdate_Options {
 	 *
 	 * @var array
 	 */
-	protected static $_tao_publish_options = array();
+	protected static $_publish_options = array();
 
 	/**
 	 * Registers all needed options via the wordpress settings API
@@ -28,48 +28,48 @@ class ScheduledUpdate_Options {
 	 * @return void
 	 */
 	public static function init() {
-		register_setting('tao_schedule_update', 'tsu_options');
+		register_setting('schedule_update', 'su_options');
 
 		add_settings_section(
-            'tsu_section',
+            'su_section',
             '',
             'intval',
-            'tsu'
+            'su'
         );
 
 		add_settings_field(
-            'tsu_field_nodate',
-            __('No Date Set', 'tao-scheduleupdate-td'),
+            'su_field_nodate',
+            __('No Date Set', 'scheduledupdate-td'),
             array(__CLASS__, 'field_nodate_cb'),
-            'tsu',
-            'tsu_section',
+            'su',
+            'su_section',
             array(
-                'label_for' => 'tsu_nodate',
-                'class' => 'tsu_row',
+                'label_for' => 'su_nodate',
+                'class' => 'su_row',
             )
         );
 
 		add_settings_field(
-            'tsu_field_visible',
-            __('Posts Visible', 'tao-scheduleupdate-td'),
+            'su_field_visible',
+            __('Posts Visible', 'scheduledupdate-td'),
             array(__CLASS__, 'field_visible_cb'),
-            'tsu',
-            'tsu_section',
+            'su',
+            'su_section',
             array(
-                'label_for' => 'tsu_visible',
-                'class' => 'tsu_row',
+                'label_for' => 'su_visible',
+                'class' => 'su_row',
             )
         );
 
 		add_settings_field(
-            'tsu_field_recursive',
-            __('Recursive scheduling', 'tao-scheduleupdate-td'),
+            'su_field_recursive',
+            __('Recursive scheduling', 'scheduledupdate-td'),
             array(__CLASS__, 'field_recursive_cb'),
-            'tsu',
-            'tsu_section',
+            'su',
+            'su_section',
             array(
-                'label_for' => 'tsu_recursive',
-                'class' => 'tsu_row',
+                'label_for' => 'su_recursive',
+                'class' => 'su_row',
             )
         );
 	}
@@ -80,7 +80,7 @@ class ScheduledUpdate_Options {
 	 * @return void
 	 */
 	public static function load_options() {
-		self::$_tao_publish_options = get_option('tsu_options');
+		self::$_publish_options = get_option('su_options');
 	}
 
 	/**
@@ -91,8 +91,8 @@ class ScheduledUpdate_Options {
 	 * @return mixed Value of the requested option
 	 */
 	public static function get( $optname ) {
-		if ( isset( self::$_tao_publish_options[ $optname ] ) ) {
-			return self::$_tao_publish_options[ $optname ];
+		if ( isset( self::$_publish_options[ $optname ] ) ) {
+			return self::$_publish_options[ $optname ];
 		}
 		return null;
 	}
@@ -107,8 +107,8 @@ class ScheduledUpdate_Options {
 	public static function options_page() {
 		// add top level menu page.
 		add_options_page(
-            ScheduledUpdate::$tao_publish_label,
-            ScheduledUpdate::$tao_publish_label,
+            ScheduledUpdate::$publish_label,
+            ScheduledUpdate::$publish_label,
             'manage_options',
             'Post Scheduled Updates',
             array(__CLASS__, 'options_page_html')
@@ -123,20 +123,20 @@ class ScheduledUpdate_Options {
 	 * @return void
 	 */
 	public static function field_nodate_cb( $args ) {
-		$options = get_option('tsu_options');
+		$options = get_option('su_options');
 ?>
 		<select id="<?php echo esc_attr($args['label_for']); ?>"
-				name="tsu_options[<?php echo esc_attr($args['label_for']); ?>]"
+				name="su_options[<?php echo esc_attr($args['label_for']); ?>]"
 		>
 			<option value="publish" <?php echo isset( $options[ $args['label_for'] ] ) ? ( selected($options[$args['label_for']], 'publish', false)) : ( '' ); ?>>
-				<?php echo esc_html(__('Publish right away', 'tao-scheduleupdate-td')); ?>
+				<?php echo esc_html(__('Publish right away', 'scheduledupdate-td')); ?>
 			</option>
 			<option value="nothing" <?php echo isset( $options[ $args['label_for'] ] ) ? ( selected($options[$args['label_for']], 'nothing', false)) : ( '' ); ?>>
-				<?php echo esc_html(__('Don\'t publish', 'tao-scheduleupdate-td')); ?>
+				<?php echo esc_html(__('Don\'t publish', 'scheduledupdate-td')); ?>
 			</option>
 		</select>
 		<p class="description">
-			<?php echo esc_html(__('What should happen to a post if it is saved with no date set?', 'tao-scheduleupdate-td')); ?>
+			<?php echo esc_html(__('What should happen to a post if it is saved with no date set?', 'scheduledupdate-td')); ?>
 		</p>
 
 		<?php
@@ -150,7 +150,7 @@ class ScheduledUpdate_Options {
 	 * @return void
 	 */
 	public static function field_visible_cb( $args ) {
-		$options = get_option('tsu_options');
+		$options = get_option('su_options');
 
 		$checked = '';
 		if ( isset( $options[ $args['label_for'] ] ) ) {
@@ -160,10 +160,10 @@ class ScheduledUpdate_Options {
 		<label for="<?php echo esc_attr($args['label_for']); ?>">
 			<input id="<?php echo esc_attr($args['label_for']); ?>"
 				   type="checkbox"
-				   name="tsu_options[<?php echo esc_attr($args['label_for']); ?>]"
+				   name="su_options[<?php echo esc_attr($args['label_for']); ?>]"
 					<?php echo $checked; // WPCS: XSS okay. ?>
 			>
-			<?php echo esc_html(__('Scheduled posts are visible for anonymous users in the frontend', 'tao-scheduleupdate-td')); ?>
+			<?php echo esc_html(__('Scheduled posts are visible for anonymous users in the frontend', 'scheduledupdate-td')); ?>
 		</label>
 		<?php
 	}
@@ -176,7 +176,7 @@ class ScheduledUpdate_Options {
 	 * @return void
 	 */
 	public static function field_recursive_cb( $args ) {
-		$options = get_option('tsu_options');
+		$options = get_option('su_options');
 
 		$checked = '';
 		if ( isset( $options[ $args['label_for'] ] ) ) {
@@ -186,10 +186,10 @@ class ScheduledUpdate_Options {
 		<label for="<?php echo esc_attr($args['label_for']); ?>">
 			<input id="<?php echo esc_attr($args['label_for']); ?>"
 				   type="checkbox"
-				   name="tsu_options[<?php echo esc_attr($args['label_for']); ?>]"
+				   name="su_options[<?php echo esc_attr($args['label_for']); ?>]"
 					<?php echo $checked; // WPCS: XSS okay. ?>
 			>
-			<?php echo esc_html(__('Allow recursive scheduling', 'tao-scheduleupdate-td')); ?>
+			<?php echo esc_html(__('Allow recursive scheduling', 'scheduledupdate-td')); ?>
 		</label>
 		<?php
 	}
@@ -206,14 +206,14 @@ class ScheduledUpdate_Options {
 		}
 
 		// show error/update messages.
-		settings_errors('tsu_messages');
+		settings_errors('su_messages');
 ?>
 		<div class="wrap">
 			<h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-			<form action="options.php" method="post">
-				<?php settings_fields('tao_schedule_update'); ?>
+			<form action="ScheduleOptions.php" method="post">
+				<?php settings_fields('schedule_update'); ?>
 
-				<?php do_settings_sections('tsu'); ?>
+				<?php do_settings_sections('su'); ?>
 
 				<?php submit_button(); ?>
 			</form>
@@ -223,7 +223,7 @@ class ScheduledUpdate_Options {
 
 }
 
-add_action( 'admin_init', array( 'ScheduledUpdate_Options', 'init' ) );
-add_action( 'admin_menu', array( 'ScheduledUpdate_Options', 'options_page' ) );
+add_action( 'admin_init', array( 'ScheduleOptions', 'init' ) );
+add_action( 'admin_menu', array( 'ScheduleOptions', 'options_page' ) );
 // since this file gets included inside a `init` callback we can just call this function straight out.
-ScheduledUpdate_Options::load_options();
+ScheduleOptions::load_options();
