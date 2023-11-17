@@ -26,9 +26,7 @@ class ScheduleOptions {
      *
      * @return void
      */
-    public static function init($templateFile) {
-
-        require_once $templateFile;
+    public static function init() {
         register_setting('schedule_update', 'su_options');
         add_settings_section(
             'su_section',
@@ -80,7 +78,7 @@ class ScheduleOptions {
      * @return void
      */
     public static function load_options() {
-        self::$_publish_options = get_option('su_options');
+        ScheduleOptions::$_publish_options = get_option('su_options');
     }
 
     /**
@@ -91,8 +89,8 @@ class ScheduleOptions {
      * @return mixed Value of the requested option
      */
     public static function get( $optname ) {
-        if ( isset( self::$_publish_options[ $optname ] ) ) {
-            return self::$_publish_options[ $optname ];
+        if ( isset( ScheduleOptions::$_publish_options[ $optname ] ) ) {
+            return ScheduleOptions::$_publish_options[ $optname ];
         }
         return null;
     }

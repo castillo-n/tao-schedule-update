@@ -3,10 +3,10 @@
  * TAO Schedule Update
  *
  * Plugin Name: Post Scheduled Updates
- * Description: Allows you to plan changes on any post type
- * Author: TAO Digital
- * Author URI: http://tao-digital.at/
- * Version: 1.15
+ * Description: Schedule changes on your post.
+ * Author: Nelson Castillo
+ * Author URI: https://castillonelson.com
+ * Version: 0.1.6
  * License: MIT
  * Text Domain: tao-scheduleupdate-td
  *
@@ -55,11 +55,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function init($toAdminFolder="/public_html/wp",$root = null) {
-        if($root===null){
-            $root = dirname(__DIR__,5);
-        }
-        ScheduleOptions::init($root.$toAdminFolder."/wp-admin/includes/template.php");
+    public static function init(): void
+    {
         ScheduledUpdate::load_plugin_textdomain();
         ScheduledUpdate::$publish_label   = __('Scheduled Update', 'tao-scheduleupdate-td');
         ScheduledUpdate::$_publish_metabox = __('Scheduled Update', 'tao-scheduleupdate-td');
@@ -80,7 +77,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    private static function load_plugin_textdomain() {
+    private static function load_plugin_textdomain(): void
+    {
         load_plugin_textdomain('scheduledupdate-td', false, dirname(plugin_basename(__FILE__)) . '/language/');
     }
 
@@ -91,7 +89,8 @@ class ScheduledUpdate {
      *
      * @return array Array of all registered post type as objects
      */
-    private static function get_post_types() {
+    private static function get_post_types(): array
+    {
         return get_post_types(array(
             'public' => true,
         ), 'objects');
@@ -105,7 +104,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function load_pubdate() {
+    public static function load_pubdate(): void
+    {
         if ( isset( $_REQUEST['postid'] ) ) { // WPCS: CSRF okay.
             $stamp = get_post_meta(absint(wp_unslash($_REQUEST['postid'])), ScheduledUpdate::$_publish_status . '_pubdate', true); // WPCS: CSRF okay.
             if ( $stamp ) {
@@ -124,7 +124,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function register_post_status() {
+    public static function register_post_status(): void
+    {
         $public = false;
         if ( ScheduleOptions::get( 'su_visible' ) ) {
             // we only want to register as public if we're not on the search page.
@@ -157,7 +158,8 @@ class ScheduledUpdate {
      *
      * @return array Array of parameters
      */
-    public static function parent_dropdown_status( $args ) {
+    public static function parent_dropdown_status( $args ): array
+    {
         if ( ! isset( $args['post_status'] ) || ! is_array( $args['post_status'] ) ) {
             $args['post_status'] = array( 'publish' );
         }
@@ -174,7 +176,8 @@ class ScheduledUpdate {
      *
      * @global $post
      */
-    public static function display_post_states( $states ) {
+    public static function display_post_states( $states ): array
+    {
         global $post;
         $arg = get_query_var('post_status');
         $the_post_types = ScheduledUpdate::get_post_types();
@@ -207,7 +210,8 @@ class ScheduledUpdate {
      *
      * @return array Array of available actions for the given post
      */
-    public static function page_row_actions( $actions, $post ) {
+    public static function page_row_actions( $actions, $post ): array
+    {
         $copy = '?action=workflow_copy_to_publish&post=' . $post->ID . '&n=' . wp_create_nonce('workflow_copy_to_publish' . $post->ID);
         if ( $post->post_status === ScheduledUpdate::$_publish_status ) {
             $action = '?action=workflow_publish_now&post=' . $post->ID . '&n=' . wp_create_nonce('workflow_publish_now' . $post->ID);
@@ -230,7 +234,8 @@ class ScheduledUpdate {
      *
      * @return array Array of available columns
      */
-    public static function manage_pages_columns( $columns ) {
+    public static function manage_pages_columns( $columns ): array
+    {
         $new = array();
         foreach ( $columns as $key => $val ) {
             $new[ $key ] = $val;
@@ -252,7 +257,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function manage_pages_custom_column( $column, $post_id ) {
+    public static function manage_pages_custom_column( $column, $post_id ): void
+    {
         if ( 'publish' === $column ) {
             $stamp = get_post_meta($post_id, ScheduledUpdate::$_publish_status . '_pubdate', true);
 
@@ -269,7 +275,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function admin_action_workflow_copy_to_publish() {
+    public static function admin_action_workflow_copy_to_publish(): void
+    {
         if ( isset( $_REQUEST['n'], $_REQUEST['post'] ) && wp_verify_nonce(sanitize_key($_REQUEST['n']), 'workflow_copy_to_publish' . absint($_REQUEST['post']))) {
             $post = get_post(absint(wp_unslash($_REQUEST['post'])));
             $publishing_id = ScheduledUpdate::create_publishing_post( $post );
@@ -290,7 +297,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function admin_action_workflow_publish_now() {
+    public static function admin_action_workflow_publish_now(): void
+    {
         if ( isset( $_REQUEST['n'], $_REQUEST['post'] ) && wp_verify_nonce(sanitize_key($_REQUEST['n']), 'workflow_publish_now' . absint($_REQUEST['post']))) {
             $post = get_post(absint(wp_unslash($_REQUEST['post'])));
             ScheduledUpdate::publish_post( $post->ID );
@@ -309,7 +317,8 @@ class ScheduledUpdate {
      *@see add_meta_box
      *
      */
-    public static function add_meta_boxes_page( $post_type, $post ) {
+    public static function add_meta_boxes_page( $post_type, $post ): void
+    {
         if ( $post->post_status !== ScheduledUpdate::$_publish_status ) {
             return;
         }
@@ -364,7 +373,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function create_meta_box( $post ) {
+    public static function create_meta_box( $post ): void
+    {
         wp_nonce_field(basename(__FILE__), ScheduledUpdate::$_publish_status . '_nonce');
         $metaname = ScheduledUpdate::$_publish_status . '_pubdate';
         $stamp = get_post_meta($post->ID, $metaname, true);
@@ -441,7 +451,8 @@ class ScheduledUpdate {
      *
      * @return string The set timezone
      */
-    private static function get_timezone_string() {
+    private static function get_timezone_string(): string
+    {
         $current_offset = get_option('gmt_offset');
         $tzstring = get_option('timezone_string');
 
@@ -473,7 +484,8 @@ class ScheduledUpdate {
      *@see DateTimeZone
      *
      */
-    private static function get_timezone_object() {
+    private static function get_timezone_object()
+    {
         $offset = intval( get_option( 'gmt_offset' ) * 3600 );
         $ids = DateTimeZone::listIdentifiers();
         foreach ( $ids as $timezone ) {
@@ -498,7 +510,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function prevent_status_change( $new_status, $old_status, $post ) {
+    public static function prevent_status_change( $new_status, $old_status, $post ): void
+    {
         if ( $new_status === $old_status && $new_status === ScheduledUpdate::$_publish_status ) { return;
         }
 
@@ -527,7 +540,8 @@ class ScheduledUpdate {
      *
      * @return int ID of the newly created post
      */
-    public static function create_publishing_post( $post ) {
+    public static function create_publishing_post( $post ): int
+    {
 
         $new_author = wp_get_current_user();
 
@@ -580,7 +594,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function copy_meta_and_terms( $source_post_id, $destination_post_id ) {
+    public static function copy_meta_and_terms( $source_post_id, $destination_post_id ): void
+    {
 
         $source_post = get_post($source_post_id);
         $destination_post = get_post($destination_post_id);
@@ -635,7 +650,8 @@ class ScheduledUpdate {
      *
      * @return mixed
      */
-    public static function save_meta( $post_id, $post ) {
+    public static function save_meta( $post_id, $post )
+    {
         if ( $post->post_status === ScheduledUpdate::$_publish_status || get_post_meta($post_id, ScheduledUpdate::$_publish_status . '_original', true)) {
             $nonce = ScheduledUpdate::$_publish_status . '_nonce';
             $pub = ScheduledUpdate::$_publish_status . '_pubdate';
@@ -680,7 +696,8 @@ class ScheduledUpdate {
      *
      * @return int the original post's id
      */
-    public static function publish_post( $post_id ) {
+    public static function publish_post( $post_id ): int
+    {
 
         $orig_id = get_post_meta($post_id, ScheduledUpdate::$_publish_status . '_original', true);
         // break early if given post is not an actual scheduled post created by this plugin.
@@ -738,7 +755,8 @@ class ScheduledUpdate {
      *
      * @return void
      */
-    public static function cron_publish_post( $post_id ) {
+    public static function cron_publish_post( $post_id ): void
+    {
         kses_remove_filters();
         ScheduledUpdate::publish_post( $post_id );
         kses_init_filters();
@@ -754,7 +772,8 @@ class ScheduledUpdate {
      *
      * @return string the formatted timestamp
      */
-    public static function get_pubdate( $stamp ) {
+    public static function get_pubdate( $stamp ): string
+    {
         $date = new DateTime('now', ScheduledUpdate::get_timezone_object() );
         $date->setTimestamp( $stamp );
         $offset = get_option('gmt_offset') * 3600;

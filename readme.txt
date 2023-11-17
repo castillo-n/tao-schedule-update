@@ -1,22 +1,4 @@
 
-== Composer Installation ==
-# run  `composer require castillo-n/wp-scheduled-update `
-add the following function to your functions file:
-use PostScheduler\ScheduledUpdate;
-`on the following init function you need to add the route from the vendor folder to the wp-admin folder.`
-`ie: if my wp-admin folder is at `
-* rootOfYourProject/public_html/wp/wp-admin
-`and my files that are in the vendor folder are at `
-* rootOfYourProject/vendor/castillo-n/wp-scheduled-update/src/scheduled-updates/ScheduledUpdate.php
-`knowing that the vendor folder and public_html are at the same level, I will have to add in the init `
-* ScheduledUpdate::init("/public_html/wp");
-`I am setting the public_html/wp as a default value because that is what I am using on the setup I have for the project I need this on`
-
-`if instead the vendor folder was at `
-* rootOfYourProject/public_html/vendor/
-then the route would be even shorter (keeping the same wp-admin location)
-* ScheduledUpdate::init("/wp");
-
 ####### from previous maintainers.
 === tao-schedule-update ===
 Contributors: romanweinberger, syberspace
