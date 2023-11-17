@@ -1,6 +1,6 @@
 <?php
 /**
- * TAO Schedule Update
+ *  Schedule Update
  *
  * Plugin Name: Post Scheduled Updates
  * Description: Schedule changes on your post.
@@ -8,13 +8,11 @@
  * Author URI: https://castillonelson.com
  * Version: 0.1.6
  * License: MIT
- * Text Domain: tao-scheduleupdate-td
+ * Text Domain: scheduleupdate-td
  *
  * @package PostScheduler
  */
 
-namespace PostScheduler;
-use PostScheduler\ScheduleOptions;
 
 /**
  *
@@ -58,15 +56,15 @@ class ScheduledUpdate {
     public static function init(): void
     {
         ScheduledUpdate::load_plugin_textdomain();
-        ScheduledUpdate::$publish_label   = __('Scheduled Update', 'tao-scheduleupdate-td');
-        ScheduledUpdate::$_publish_metabox = __('Scheduled Update', 'tao-scheduleupdate-td');
+        ScheduledUpdate::$publish_label   = __('Scheduled Update', 'scheduleupdate-td');
+        ScheduledUpdate::$_publish_metabox = __('Scheduled Update', 'scheduleupdate-td');
         ScheduledUpdate::register_post_status();
 
         $pt = ScheduledUpdate::get_post_types();
         foreach ( $pt as $type ) {
-            add_action('manage_edit-' . $type->name . '_columns', array('PostScheduler\\ScheduledUpdate', 'manage_pages_columns'));
-            add_filter('manage_' . $type->name . '_posts_custom_column', array('PostScheduler\\ScheduledUpdate', 'manage_pages_custom_column'), 10, 2);
-            add_action('add_meta_boxes', array('PostScheduler\\ScheduledUpdate', 'add_meta_boxes_page'), 10, 2);
+            add_action('manage_edit-' . $type->name . '_columns', array('ScheduledUpdate', 'manage_pages_columns'));
+            add_filter('manage_' . $type->name . '_posts_custom_column', array('ScheduledUpdate', 'manage_pages_custom_column'), 10, 2);
+            add_action('add_meta_boxes', array('ScheduledUpdate', 'add_meta_boxes_page'), 10, 2);
         }
     }
 
@@ -110,7 +108,7 @@ class ScheduledUpdate {
             $stamp = get_post_meta(absint(wp_unslash($_REQUEST['postid'])), ScheduledUpdate::$_publish_status . '_pubdate', true); // WPCS: CSRF okay.
             if ( $stamp ) {
                 $str  = '<div style="margin-left:20px">';
-                $str .= TaoPublish::get_pubdate( $stamp );
+                $str .= ScheduledUpdate::get_pubdate( $stamp );
                 $str .= '</div>';
                 die( $str ); // WPCS: XSS okay.
             }
@@ -152,7 +150,7 @@ class ScheduledUpdate {
     }
 
     /**
-     * Adds the tao-schedule-update post status to the list of displayable stati in the parent dropdown
+     * Adds the schedule-update post status to the list of displayable stati in the parent dropdown
      *
      * @param array $args arguments passed by the filter.
      *
@@ -324,8 +322,8 @@ class ScheduledUpdate {
         }
 
         // hides everything except the 'publish' button in the 'publish'-metabox
-        echo '<style> #duplicate-action, #delete-action, #minor-publishing-actions, #misc-publishing-actions, #preview-action {display:none;} </style>'; // WPCS: XSS okay.
-
+        wp_add_inline_style("add_meta_boxes_page_css",'<style> #duplicate-action, #delete-action, #minor-publishing-actions, #misc-publishing-actions, #preview-action {display:none;} </style>');
+        wp_enqueue_style( 'add_meta_boxes_page_css' );
         wp_enqueue_script('jquery-ui-datepicker');
         $url = '//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/blitzer/jquery-ui.min.css';
         wp_enqueue_style('jquery-ui-blitzer', $url);
@@ -361,7 +359,7 @@ class ScheduledUpdate {
             ),
         );
 
-        wp_localize_script(ScheduledUpdate::$_publish_status . '-datepicker.js', 'TAOScheduleUpdate', $js_data);
+        wp_localize_script(ScheduledUpdate::$_publish_status . '-datepicker.js', 'ScheduleUpdate', $js_data);
 
         add_meta_box('meta_' . ScheduledUpdate::$_publish_status, ScheduledUpdate::$_publish_metabox, array('ScheduledUpdate', 'create_meta_box'), $post_type, 'side');
     }
@@ -783,17 +781,17 @@ class ScheduledUpdate {
 
 }
 
-add_action( 'save_post', array( 'PostScheduler\\ScheduledUpdate', 'save_meta' ), 10, 2 );
-add_action( 'publish_post', array( 'PostScheduler\\ScheduledUpdate', 'cron_publish_post' ) );
+add_action( 'save_post', array( 'ScheduledUpdate', 'save_meta' ), 10, 2 );
+add_action( 'publish_post', array( 'ScheduledUpdate', 'cron_publish_post' ) );
 
-add_action( 'wp_ajax_load_pubdate', array( 'PostScheduler\\ScheduledUpdate', 'load_pubdate' ) );
-add_action( 'init', array( 'PostScheduler\\ScheduledUpdate', 'init' ), PHP_INT_MAX );
-add_action( 'admin_action_workflow_copy_to_publish', array( 'PostScheduler\\ScheduledUpdate', 'admin_action_workflow_copy_to_publish' ) );
-add_action( 'admin_action_workflow_publish_now', array( 'PostScheduler\\ScheduledUpdate', 'admin_action_workflow_publish_now' ) );
-add_action( 'transition_post_status', array( 'PostScheduler\\ScheduledUpdate', 'prevent_status_change' ), 10, 3 );
+add_action( 'wp_ajax_load_pubdate', array( 'ScheduledUpdate', 'load_pubdate' ) );
+add_action( 'init', array( 'ScheduledUpdate', 'init' ), PHP_INT_MAX );
+add_action( 'admin_action_workflow_copy_to_publish', array( 'ScheduledUpdate', 'admin_action_workflow_copy_to_publish' ) );
+add_action( 'admin_action_workflow_publish_now', array( 'ScheduledUpdate', 'admin_action_workflow_publish_now' ) );
+add_action( 'transition_post_status', array( 'ScheduledUpdate', 'prevent_status_change' ), 10, 3 );
 
-add_filter( 'display_post_states', array( 'PostScheduler\\ScheduledUpdate', 'display_post_states' ) );
-add_filter( 'page_row_actions', array( 'PostScheduler\\ScheduledUpdate', 'page_row_actions' ), 10, 2 );
-add_filter( 'post_row_actions', array( 'PostScheduler\\ScheduledUpdate', 'page_row_actions' ), 10, 2 );
-add_filter( 'manage_pages_columns', array( 'PostScheduler\\ScheduledUpdate', 'manage_pages_columns' ) );
-add_filter( 'page_attributes_dropdown_pages_args', array( 'PostScheduler\\ScheduledUpdate', 'parent_dropdown_status' ) );
+add_filter( 'display_post_states', array( 'ScheduledUpdate', 'display_post_states' ) );
+add_filter( 'page_row_actions', array( 'ScheduledUpdate', 'page_row_actions' ), 10, 2 );
+add_filter( 'post_row_actions', array( 'ScheduledUpdate', 'page_row_actions' ), 10, 2 );
+add_filter( 'manage_pages_columns', array( 'ScheduledUpdate', 'manage_pages_columns' ) );
+add_filter( 'page_attributes_dropdown_pages_args', array( 'ScheduledUpdate', 'parent_dropdown_status' ) );

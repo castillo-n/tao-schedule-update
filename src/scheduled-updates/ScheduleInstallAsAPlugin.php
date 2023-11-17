@@ -35,15 +35,22 @@ class ScheduleInstallAsAPlugin {
                     }
                 }
             }
+            if(!is_dir($newDir.'/js')) {
+                mkdir($newDir.'/js',0755);
+            }
             if($override) {
                 $fileUpdate = '/ScheduledUpdate.php';
                 $fileOptions = '/ScheduleOptions.php';
+                $fileJS = '/js/publish-datepicker.js';
                 $here = __DIR__;
                 if (!is_file($newDir . '/updateScheduler' . $fileUpdate)) {
                     copy($here . $fileUpdate, $newDir . $fileUpdate);
                 }
                 if (!is_file($newDir . '/updateScheduler' . $fileOptions)) {
                     copy($here . $fileOptions, $newDir . $fileOptions);
+                }
+                if (!is_file($newDir . '/updateScheduler' . $fileOptions)) {
+                    copy($here . $fileJS, $newDir . $fileJS);
                 }
             }
         }else {

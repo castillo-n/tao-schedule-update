@@ -5,9 +5,8 @@
  * @package PostScheduler
  */
 
-namespace PostScheduler;
 /**
- * TAO Schedule Update options class
+ *  Schedule Update options class
  */
 class ScheduleOptions {
 
@@ -108,7 +107,7 @@ class ScheduleOptions {
             ScheduledUpdate::$publish_label,
             ScheduledUpdate::$publish_label,
             'manage_options',
-            'Post Scheduled Updates',
+            'ScheduleOptions.php',
             array(__CLASS__, 'options_page_html')
         );
     }
@@ -208,7 +207,7 @@ class ScheduleOptions {
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <form action="ScheduleOptions.php" method="post">
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"])."?page=Post+Scheduled+Updates"; ?>" method="post">
                 <?php settings_fields('schedule_update'); ?>
 
                 <?php do_settings_sections('su'); ?>
@@ -221,7 +220,7 @@ class ScheduleOptions {
 
 }
 
-add_action( 'admin_init', array( 'PostScheduler\\ScheduleOptions', 'init' ) );
-add_action( 'admin_menu', array( 'PostScheduler\\ScheduleOptions', 'options_page' ) );
+add_action( 'admin_init', array( 'ScheduleOptions', 'init' ) );
+add_action( 'admin_menu', array( 'ScheduleOptions', 'options_page' ) );
 // since this file gets included inside a `init` callback we can just call this function straight out.
 ScheduleOptions::load_options();
